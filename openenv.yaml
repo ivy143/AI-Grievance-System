@@ -1,7 +1,10 @@
 id: grievance-env
 name: AI Grievance Redressal Environment
 description: Simulates public complaint handling with classification, routing, response, and escalation.
-entry_point: env.environment:GrievanceEnv
+version: 1.0
+
+
+entry_point: environment:GrievanceEnv
 
 tasks:
   - name: easy_classification
@@ -10,5 +13,3 @@ tasks:
     description: Classify, assign priority, and department
   - name: hard_full_lifecycle
     description: Full complaint lifecycle handling
-
-version: 1.0
