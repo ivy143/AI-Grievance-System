@@ -1,11 +1,17 @@
+import os
+import sys
 from fastapi import FastAPI
+import uvicorn
+
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from environment import GrievanceEnv
 from models import Action
-import uvicorn
 
 app = FastAPI()
 
-# Sample complaints
+# Sample complaints data
 complaints = [
     {"text": "Road broken", "category": "road", "priority": "high", "department": "infrastructure"},
     {"text": "Street light not working", "category": "electricity", "priority": "medium", "department": "power"},
@@ -44,11 +50,7 @@ def step(action_data: dict):
         "info": info
     }
 
-# --- VALIDATOR REQUIREMENT: MAIN FUNCTION ---
 def main():
-    """
-    OpenEnv validator calls this function to start the server.
-    """
     print("Starting OpenEnv Server on port 7860...")
     uvicorn.run(app, host="0.0.0.0", port=7860)
 

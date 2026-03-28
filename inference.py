@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from environment import GrievanceEnv
-from models import Action
+from server.environment import GrievanceEnv
+from server.models import Action
 import uvicorn
 
 app = FastAPI()
