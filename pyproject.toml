@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grievance-env"
+version = "0.1.0"
+description = "Public Grievance RL Environment"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "openenv"
+]
