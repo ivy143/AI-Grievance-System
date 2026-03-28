@@ -11,5 +11,6 @@ dependencies = [
     "uvicorn",
     "openenv"
 ]
+
 [project.scripts]
-server = "inference:app"
+server = "server.app:app"
