@@ -5,7 +5,7 @@ import uvicorn
 
 app = FastAPI()
 
-# sample complaints
+# Sample complaints
 complaints = [
     {"text": "Road broken", "category": "road", "priority": "high", "department": "infrastructure"},
     {"text": "Street light not working", "category": "electricity", "priority": "medium", "department": "power"},
@@ -17,7 +17,6 @@ env = GrievanceEnv(complaints)
 @app.post("/reset")
 def reset():
     obs = env.reset()
-    
     return {
         "complaint": obs.complaint,
         "status": obs.status,
@@ -26,13 +25,11 @@ def reset():
 
 @app.post("/step")
 def step(action_data: dict):
-    
     act = Action(
         action_type=action_data.get("action_type"),
         value=action_data.get("value")
     )
     obs, reward, done, info = env.step(act)
-    
     return {
         "observation": {
             "complaint": obs.complaint,
@@ -47,6 +44,13 @@ def step(action_data: dict):
         "info": info
     }
 
+# --- VALIDATOR REQUIREMENT: MAIN FUNCTION ---
+def main():
+    """
+    OpenEnv validator calls this function to start the server.
+    """
+    print("Starting OpenEnv Server on port 7860...")
+    uvicorn.run(app, host="0.0.0.0", port=7860)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    main()
