@@ -109,7 +109,7 @@ This project simulates a **complete grievance lifecycle system**, where an AI ag
 
 ---
 
-## 📊 Tracking & Accountability System (Core Innovation 🔥)
+## 📊 Tracking & Accountability System 
 
 The environment includes a built-in tracking mechanism:
 
