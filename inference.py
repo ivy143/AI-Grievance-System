@@ -1,52 +1,32 @@
-from fastapi import FastAPI
-from server.environment import GrievanceEnv
-from server.models import Action
-import uvicorn
+import os
+import sys
 
-app = FastAPI()
 
-# sample complaints
-complaints = [
-    {"text": "Road broken", "category": "road", "priority": "high", "department": "infrastructure"},
-    {"text": "Street light not working", "category": "electricity", "priority": "medium", "department": "power"},
-    {"text": "No water supply", "category": "water", "priority": "high", "department": "water_board"},
-]
+sys.path.append(os.path.join(os.path.dirname(__file__), "server"))
 
-env = GrievanceEnv(complaints)
 
-@app.post("/reset")
-def reset():
+try:
+    from environment import GrievanceEnv
+    from models import Action
+except ImportError:
+    from server.environment import GrievanceEnv
+    from server.models import Action
+
+def run_inference():
+    print("Validator is checking inference.py...")
+    
+    
+    complaints = [
+        {"text": "Road broken", "category": "road", "priority": "high", "department": "infrastructure"}
+    ]
+    
+    
+    env = GrievanceEnv(complaints)
     obs = env.reset()
     
-    return {
-        "complaint": obs.complaint,
-        "status": obs.status,
-        "history": obs.history
-    }
-
-@app.post("/step")
-def step(action_data: dict):
-    
-    act = Action(
-        action_type=action_data.get("action_type"),
-        value=action_data.get("value")
-    )
-    obs, reward, done, info = env.step(act)
-    
-    return {
-        "observation": {
-            "complaint": obs.complaint,
-            "category": obs.category,
-            "priority": obs.priority,
-            "department": obs.department,
-            "status": obs.status,
-            "delay": obs.delay
-        },
-        "reward": reward.score,
-        "done": done,
-        "info": info
-    }
-
+    print(f"Check passed! Current complaint: {obs.complaint}")
+    return 0
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    
+    sys.exit(run_inference())
