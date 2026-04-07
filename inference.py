@@ -9,18 +9,19 @@ try:
     from environment import GrievanceEnv
     from models import Action
 except ImportError:
+    # Backup import
     from server.environment import GrievanceEnv
     from server.models import Action
 
 def run_inference():
     print("Validator is checking inference.py...")
     
-    
+    # Simple complaints data
     complaints = [
         {"text": "Road broken", "category": "road", "priority": "high", "department": "infrastructure"}
     ]
     
-    
+    # Environment check
     env = GrievanceEnv(complaints)
     obs = env.reset()
     
