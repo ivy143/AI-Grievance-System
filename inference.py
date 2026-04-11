@@ -46,7 +46,9 @@ def run_inference():
             obs, reward, done, _, info_dict = env.step(act) 
             
             total_steps += 1
-            print(f"[STEP] step={total_steps} reward={float(reward):.2f} info='Status: {obs.status}'", flush=True)
+            
+           
+            print(f"[STEP] step={total_steps} reward={float(reward):.2f} info='Step Completed'", flush=True)
             if done:
                 break
             
