@@ -1,31 +1,47 @@
-class GrievanceEnv:
-    def __init__(self, complaints):
-        self.complaints = complaints
+import gymnasium as gym
+from gymnasium import spaces
+import numpy as np
+
+class GrievanceEnv(gym.Env):
+    def __init__(self, complaints_data):
+        super(GrievanceEnv, self).__init__()
+        self.complaints = complaints_data
         self.current_idx = 0
+        self.steps_taken = 0
+        self.current_status = 0  # 0:Pending, 1:In_Prog, 2:Escalated, 3:Resolved
         
-    def reset(self):
-        self.current_idx = 0
-       
-        return self._get_obs()
+        # Simple Discrete Action Space
+        self.action_space = spaces.Discrete(4)
         
-    def _get_obs(self):
+        # Box Observation Space (Fail-proof)
+        self.observation_space = spaces.Box(low=0, high=100, shape=(2,), dtype=np.int32)
+
+    def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
+        self.steps_taken = 0
+        self.current_status = 0
         
-        comp = self.complaints[self.current_idx]
-        class Observation:
-            def __init__(self, d):
-                self.complaint = d["text"]
-                self.category = d.get("category", "")
-                self.priority = d.get("priority", "")
-                self.department = d.get("department", "")
-                self.status = "pending"
-                self.delay = 0
-                self.history = []
-        return Observation(comp)
+        # Return observation and empty info dict
+        obs = np.array([self.current_status, self.steps_taken], dtype=np.int32)
+        return obs, {}
 
     def step(self, action):
-       
-        reward = type('Reward', (), {'score': 1.0})()
-        done = False
-        info = {}
-        obs = self._get_obs()
-        return obs, reward, done, info
+        self.steps_taken += 1
+        reward = -0.05  # Efficiency penalty
+        
+        # Lifecycle Logic: Pending -> In Progress -> Escalated -> Resolved
+        if action == 3: 
+            self.current_status = 3
+            reward += 1.0
+        elif action == 2:
+            self.current_status = 2
+            reward += 0.3
+        elif action == 1:
+            self.current_status = 1
+            reward += 0.1
+            
+        terminated = bool(self.current_status == 3)
+        truncated = False
+        obs = np.array([self.current_status, self.steps_taken], dtype=np.int32)
+        
+        return obs, float(reward), terminated, truncated, {}
