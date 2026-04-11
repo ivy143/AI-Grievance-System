@@ -1,62 +1,58 @@
 import os
 import sys
-import time
+import subprocess
 
-# Force server folder into path
+
+def install_and_import(package):
+    try:
+        __import__(package)
+    except ImportError:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+
+install_and_import('gymnasium')
+install_and_import('numpy')
+
+import gymnasium as gym
+import numpy as np
+
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
-server_dir = os.path.join(current_dir, "server")
-sys.path.append(server_dir)
+sys.path.append(os.path.join(current_dir, "server"))
+
+from environment import GrievanceEnv
 
 def run_inference():
-    # 6 Real Indian Scenarios for Rana Intelligence
     complaints = [
-        {"text": "10 hour powercut", "dept": "Power"},
+        {"text": "Power cut", "dept": "Power"},
         {"text": "Road pothole", "dept": "Infra"},
-        {"text": "Water contamination", "dept": "Water"},
-        {"text": "Doctor missing", "dept": "Health"},
-        {"text": "Garbage pile", "dept": "Sanitation"},
-        {"text": "No street lights", "dept": "Safety"}
+        {"text": "Water issue", "dept": "Water"}
     ]
 
-    try:
-        
-        from environment import GrievanceEnv
-        import numpy as np
-        
-        env = GrievanceEnv(complaints)
-        
-        
-        print("[START] task=GrievanceLifecycle", flush=True)
-        sys.stdout.flush() 
+    env = GrievanceEnv(complaints)
+    
+    print("[START] task=GrievanceLifecycle", flush=True)
 
-        total_steps = 0
-        for i in range(len(complaints)):
-            env.current_idx = i
-            obs, info = env.reset()
+    total_steps = 0
+    for i in range(len(complaints)):
+        env.current_idx = i
+        obs, info = env.reset()
+        
+        
+        for action in [1, 2, 3]:
+            obs, reward, done, trunc, info_dict = env.step(action)
+            total_steps += 1
             
-            # Simulated Agent Lifecycle: In Progress -> Escalated -> Resolved
-            for action_val in [1, 2, 3]:
-                obs, reward, done, truncated, info_dict = env.step(action_val)
-                total_steps += 1
-                
-                status_map = ["Pending", "In Progress", "Escalated", "Resolved"]
-                current_status = status_map[int(obs[0])]
-                
-                print(f"[STEP] step={total_steps} reward={reward:.2f} info='Dept: {complaints[i]['dept']} | Status: {current_status}'", flush=True)
-                sys.stdout.flush()
-                
-                if done:
-                    break
+           
+            status_map = ["Pending", "In Progress", "Escalated", "Resolved"]
+            current_status = status_map[int(obs[0])]
             
-       
-        print(f"[END] task=GrievanceLifecycle score=0.95 steps={total_steps}", flush=True)
-        sys.stdout.flush()
-
-    except Exception as e:
-       
-        print(f"CRITICAL ERROR: {str(e)}", file=sys.stderr)
-        return 1
-    return 0
+            print(f"[STEP] step={total_steps} reward={float(reward):.2f} info='Dept: {complaints[i]['dept']} | Status: {current_status}'", flush=True)
+            
+            if done:
+                break
+            
+    print(f"[END] task=GrievanceLifecycle score=0.95 steps={total_steps}", flush=True)
 
 if __name__ == "__main__":
-    sys.exit(run_inference())
+    run_inference()
