@@ -38,12 +38,14 @@ def run_inference():
             print(f"Proxy Call Notice: {e}")
 
         # Simulate actions
-        for action_val in [1, 2, 3]: # Simple sequence: Progress -> Escalate -> Resolve
+        for action_val in [1, 2, 3]: 
             from models import Action
             act = Action(action_type="status_update", value=str(action_val))
-            obs, reward, done, info_dict = env.step(act)
-            total_steps += 1
             
+            # FIXED LINE BELOW: Added underscore for the 5th value
+            obs, reward, done, _, info_dict = env.step(act) 
+            
+            total_steps += 1
             print(f"[STEP] step={total_steps} reward={float(reward.score):.2f} info='Status: {obs.status}'", flush=True)
             
             if done:
