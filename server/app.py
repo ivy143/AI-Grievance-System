@@ -2,6 +2,12 @@ import os
 import sys
 from fastapi import FastAPI
 import uvicorn
+from openai import OpenAI
+
+
+client = OpenAI(
+    base_url=os.environ.get("API_BASE_URL"), 
+    api_key=os.environ.get("API_KEY")
 
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
