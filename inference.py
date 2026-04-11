@@ -3,12 +3,15 @@ import sys
 from openai import OpenAI
 
 
+api_base = os.environ.get("API_BASE_URL")
+api_key = os.environ.get("API_KEY")
+
 client = OpenAI(
-    base_url=os.environ.get("API_BASE_URL", "https://api.openai.com/v1"), 
-    api_key=os.environ.get("API_KEY", "dummy-key")
+    base_url=api_base,
+    api_key=api_key
 )
 
-# Environment setup
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "server"))
 from environment import GrievanceEnv
@@ -29,26 +32,32 @@ def run_inference():
         
         
         try:
+            print(f"Sending request to Proxy: {api_base}", flush=True)
             response = client.chat.completions.create(
-                model="gpt-4o", # Ya jo bhi model Scaler allow kare
-                messages=[{"role": "user", "content": f"Analyze this: {obs.complaint}"}]
+                model="gpt-4o", 
+                messages=[{"role": "user", "content": "Classify this grievance: " + str(obs)}]
             )
-            print(f"AI Analysis: {response.choices[0].message.content[:50]}...")
+           
+            print(f"Proxy Response Received", flush=True)
         except Exception as e:
-            print(f"Proxy Call Notice: {e}")
+            print(f"CRITICAL PROXY ERROR: {e}", flush=True)
+            
+            raise e 
 
-        # Simulate actions
-        for action_val in [1, 2, 3]: 
+        # 3. Actions Loop
+        for action_val in [1, 2, 3]:
             from models import Action
             act = Action(action_type="status_update", value=str(action_val))
             
-            # FIXED LINE BELOW: Added underscore for the 5th value
-            obs, reward, done, _, info_dict = env.step(act) 
+            result = env.step(act)
+            if len(result) == 5:
+                obs, reward, done, _, info_dict = result
+            else:
+                obs, reward, done, info_dict = result
             
             total_steps += 1
+            print(f"[STEP] step={total_steps} reward={float(reward):.2f} info='Processing'", flush=True)
             
-           
-            print(f"[STEP] step={total_steps} reward={float(reward):.2f} info='Step Completed'", flush=True)
             if done:
                 break
             
